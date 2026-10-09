@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: cinema-reservation
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cinema
+    username: cinema
+    password: cinema
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+server:
+  port: 8081
