@@ -4,7 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
@@ -30,7 +29,6 @@ public class Hall {
     @Column(name="hall_id", nullable = false, unique = true)
     Long id;
 
-    @OneToMany 
     
     @Column(name="name")
     String name;

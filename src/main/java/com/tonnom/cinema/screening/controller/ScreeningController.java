@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tonnom.cinema.screening.dto.ScreeningResponse;
 import com.tonnom.cinema.screening.service.ScreeningService;
-
+import com.tonnom.cinema.screening.dto.SeatsMapResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController 
@@ -32,5 +32,10 @@ public class ScreeningController {
     @GetMapping("/{id}")
     public ScreeningResponse getOne(@PathVariable Long id){
         return screeningService.getById(id);
+    }
+
+    @GetMapping ("/{id}/seats")
+    public SeatsMapResponse getSeats(@PathVariable Long id){
+        return screeningService.getSeatsMap(id);
     }
 }
