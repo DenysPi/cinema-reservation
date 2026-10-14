@@ -6,10 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.tonnom.cinema.booking.dto.SeatHoldResponse;
+import com.tonnom.cinema.booking.event.SeatHeldEvent;
 import com.tonnom.cinema.booking.repository.BookingSeatRepository;
 import com.tonnom.cinema.common.exception.SeatAlreadyHeldException;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +28,7 @@ public class SeatAvaibilityService {
     private final StringRedisTemplate redis;
     private final BookingSeatRepository bookingSeatRepository;
 
-
+    private final ApplicationEventPublisher eventPublisher;
 
     public SeatHoldResponse hold(Long screeningId, Long seatId, Long userId){
 
@@ -34,6 +36,7 @@ public class SeatAvaibilityService {
         takeSeat(screeningId, seatId, userId);
         trackUserHold(screeningId, seatId, userId);
 
+        eventPublisher.publishEvent(new SeatHeldEvent(screeningId, seatId));
         return SeatHoldResponse.builder()
                                 .screeningId(screeningId)
                                 .seatId(seatId)
