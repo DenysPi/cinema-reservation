@@ -38,4 +38,6 @@ public class SeatUpdateNotifier {
     public void onSeatHeld(SeatHeldEvent event){
         send(SeatUpdateMessage.of(event.screeningId(), List.of(event.seatId()), SeatStatus.HELD));
     }
+
+    
 }
