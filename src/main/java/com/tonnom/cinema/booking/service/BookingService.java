@@ -87,7 +87,7 @@ public class BookingService {
         
 
         eventPublisher.publishEvent(new BookingConfirmedEvent(request.screeningId(), seatsIds, request.screeningId(), screening.getStartTime()));
-
+        
         return BookingResponse.builder()
             .bookingId(booking.getId())
             .reference(booking.getReference())

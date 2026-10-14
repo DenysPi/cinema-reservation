@@ -70,7 +70,7 @@ public class ScreeningService {
         List<SeatInfo> result = new ArrayList<>();
 
         for(Seat seat: seats){
-            SeatStatus status = takenSeatsIds.contains(seat.getId()) ? SeatStatus.TAKEN : SeatStatus.FREE;
+            SeatStatus status = takenSeatsIds.contains(seat.getId()) ? SeatStatus.BOOKED : SeatStatus.FREE;
             result.add(SeatInfo.builder()
                                     .seatId(seat.getId())
                                     .rowLabel(seat.getRowLabel())

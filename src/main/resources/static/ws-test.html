@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h3>Updates in live</h3>
+    <pre id="log"></pre>
+    <script type="module">
+        
+        import { Client } from 'https://cdn.jsdelivr.net/npm/@stomp/stompjs@7/+esm';
+
+        const log = (text) => document.getElementById("log").textContent += text + '\n';
+        const screeningId = 1
+        const client = new Client({
+            brokerURL: 'ws://localhost:8081/ws',
+            reconnectDelay: 3000,
+            onConnect: () => {
+                log('connected');
+                client.subscribe(`/topic/screenings/${screeningId}/seats`, (message) => {
+                log(message.body);
+            });
+        },
+        onWebSocketClose: () => log('disconnected'),
+        onStompError: (frame) => log('error: ' + frame.headers['message']),
+        });
+
+        client.activate();
+    </script>
+</body>
+</html>
