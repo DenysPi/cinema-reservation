@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
     }
 
 
-    @ExceptionHandler({SeatNotHeldException.class, SeatAlreadyHeldException.class})
+    @ExceptionHandler({SeatNotHeldException.class, SeatAlreadyHeldException.class, SeatAlreadyBookedException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleConflict(RuntimeException e) {
         return new ErrorResponse(e.getMessage());

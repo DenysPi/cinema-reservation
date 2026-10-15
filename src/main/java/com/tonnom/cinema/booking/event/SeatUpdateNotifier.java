@@ -9,7 +9,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.tonnom.cinema.booking.dto.SeatUpdateMessage;
-import com.tonnom.cinema.booking.dto.SeatUpdateMessage.SeatUpdate;
+
 import com.tonnom.cinema.screening.dto.SeatStatus;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -34,10 +34,19 @@ public class SeatUpdateNotifier {
        
     }
 
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onBookingCancelled(BookingCancelledEvent event){
+        send(SeatUpdateMessage.of(event.screeningId(), event.seatIds(), SeatStatus.FREE));
+    }
+
     @EventListener 
     public void onSeatHeld(SeatHeldEvent event){
         send(SeatUpdateMessage.of(event.screeningId(), List.of(event.seatId()), SeatStatus.HELD));
     }
 
-    
+
+    @EventListener 
+    public void onSeatRelease(SeatReleaseEvent event){
+        send(SeatUpdateMessage.of(event.screeningId(), event.seatIds(), SeatStatus.FREE));
+    }
 }
