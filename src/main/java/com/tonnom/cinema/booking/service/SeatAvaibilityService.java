@@ -12,8 +12,12 @@ import org.springframework.stereotype.Service;
 
 import com.tonnom.cinema.booking.dto.SeatHoldResponse;
 import com.tonnom.cinema.booking.event.SeatHeldEvent;
+import com.tonnom.cinema.booking.event.SeatReleaseEvent;
 import com.tonnom.cinema.booking.repository.BookingSeatRepository;
+import com.tonnom.cinema.common.exception.SeatAlreadyBookedException;
 import com.tonnom.cinema.common.exception.SeatAlreadyHeldException;
+import com.tonnom.cinema.common.exception.SeatNotHeldException;
+
 import lombok.RequiredArgsConstructor;
 
 @Service 
@@ -52,36 +56,18 @@ public class SeatAvaibilityService {
     
     }
 
-    public void release(Long screeningId, List<Long> seatIds, Long userId) {
-        if (seatIds == null || seatIds.isEmpty()) {
-            return;
-        }
 
-        List<String> keys = seatKeys(screeningId, seatIds);
-        
-        List<String> values = redis.opsForValue().multiGet(keys);
-        String expected = userId.toString();
+    public void releaseSeat(Long screeningId, Long seatId, Long userId) {
+        String owner = redis.opsForValue().get(seatKey(screeningId, seatId));
 
-        
-        if (values != null) {
-            List<String> owned = new ArrayList<>();
-            for (int i = 0; i < keys.size(); i++) {
-                if (expected.equals(values.get(i))) {
-                    owned.add(keys.get(i));
-                }
-            }
-            if (!owned.isEmpty()) {
-                redis.delete(owned);
-            }
-        }
-
-        
-        redis.opsForSet().remove(
-                userKey(screeningId, userId),
-                seatIds.stream().map(String::valueOf).toArray());
+        if (owner == null) return;
+        if(BOOKED.equals(owner)) throw new SeatAlreadyBookedException("Seat " + seatId + "is already booked by someone");
+        if(!isOwnedBy(owner, userId)) throw new SeatNotHeldException("Seat" + seatId + "is not held by you");
+        deleteOwnedHolds(screeningId, List.of(seatId), userId);
     }
+    
 
-    public void releaseAll(Long screeningId, Long userId) {
+    public void releaseAllHolds(Long screeningId, Long userId) {
         String userKey = userKey(screeningId, userId);
         Set<String> members = redis.opsForSet().members(userKey);
 
@@ -89,20 +75,20 @@ public class SeatAvaibilityService {
             List<Long> seatIds = members.stream()
                     .map(Long::valueOf)
                     .toList();
-            release(screeningId, seatIds, userId);
+            deleteOwnedHolds(screeningId, seatIds, userId);
         }
 
         redis.delete(userKey);
     }
 
     public void markBooked(Long screeningId, List<Long> seatIds, Long userId, LocalDateTime screeningStart){
-        Duration ttl = Duration.between(LocalDateTime.now(), screeningStart);
+        Duration ttl = Duration.between(LocalDateTime.now(), screeningStart.plusDays(1));
 
         for(String key: seatKeys(screeningId, seatIds)){
             redis.opsForValue().set(key, BOOKED, ttl);
         }
 
-        releaseAll(screeningId, userId);
+        releaseAllHolds(screeningId, userId);
 
     }
 
@@ -111,6 +97,10 @@ public class SeatAvaibilityService {
         redis.delete(seatKeys(screeningId, seatIds));
     
     }
+
+
+    // HELPERS ::
+
     private void ensureNotBooked(Long screeningId, Long seatId){
         if (bookingSeatRepository.existsByScreeningIdAndSeatId(screeningId, seatId)) {
             throw new SeatAlreadyHeldException("Seat " + seatId + " is already booked");
@@ -131,6 +121,42 @@ public class SeatAvaibilityService {
         redis.expire(userKey, HOLD_DURATION);
     }
 
+
+    private boolean isOwnedBy(String owner, Long userId){
+        return userId.toString().equals(owner);
+    }
+
+    private void deleteOwnedHolds(Long screeningId, List<Long> seatIds, Long userId){
+        List<String> keys = seatKeys(screeningId, seatIds);
+        List<String> values = redis.opsForValue().multiGet(keys);
+
+        List<String> ownedKeys = new ArrayList<>();
+        List<Long> freedSeatIds = new ArrayList<>();
+
+        if (values != null){
+            for (int i = 0; i < keys.size(); i++){
+                if(isOwnedBy(values.get(i), userId)){
+                    ownedKeys.add(keys.get(i));
+                    freedSeatIds.add(seatIds.get(i));
+                }
+            }
+        }
+
+        if(!ownedKeys.isEmpty()){
+
+            redis.delete(ownedKeys);
+            eventPublisher.publishEvent(new SeatReleaseEvent(screeningId, freedSeatIds));
+        }
+
+        untrackUserHolds(screeningId, seatIds, userId);
+        
+
+    }
+
+    private void untrackUserHolds(Long screeningId, List<Long> seatIds, Long userId){
+
+        redis.opsForSet().remove(userKey(screeningId, userId), seatIds.stream().map(String::valueOf).toArray());
+    }
     private List<String> seatKeys (Long screeningId, List<Long> seatIds){
         return seatIds.stream().map(seatId -> seatKey(screeningId, seatId)).toList();
     }

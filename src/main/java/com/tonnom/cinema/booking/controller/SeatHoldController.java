@@ -38,6 +38,6 @@ public class SeatHoldController {
     public void calcelHold(@PathVariable Long screeningId,
                    @PathVariable Long seatId,
                    @RequestParam Long userId){
-        seatAvaibilityService.release(screeningId, List.of(seatId), userId);
+        seatAvaibilityService.releaseSeat(screeningId, seatId, userId);
     }
 }
