@@ -26,9 +26,7 @@ import com.tonnom.cinema.common.exception.SeatNotHeldException;
 
 public class SeatAvaibilityServiceTest extends IntegrationTest{
     
-    private static final Long SCREENING = 1L;
-    private static final Long USER1 = 1L;
-    private static final Long USER2 = 2L;
+    
 
     @Autowired 
     private SeatAvaibilityService seatAvaibilityService;

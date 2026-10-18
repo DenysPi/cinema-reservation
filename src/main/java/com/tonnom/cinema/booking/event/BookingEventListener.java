@@ -12,12 +12,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor 
 public class BookingEventListener {
     
-    public final SeatAvaibilityService seatAvaibilityService;
+    private final SeatAvaibilityService seatAvaibilityService;
 
 
     @TransactionalEventListener (phase = TransactionPhase.AFTER_COMMIT)
     public void onConfirmed(BookingConfirmedEvent event){
         seatAvaibilityService.markBooked(event.screeningId(), event.seatIds(), event.userId(), event.startTime());
+
     }
 
 

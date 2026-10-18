@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #map {
+            display: grid;
+            grid-template-columns: repeat(12,36px);
+            gap: 6px;
+        }
+
+        .seat {
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+        }
+
+        .FREE {background: #2e9e4f;}
+        .HELD { background: #e0a020; }
+        .BOOKED { background: #c0392b; }
+    </style>
+</head>
+<body>
+    <h3>Updates in live</h3>
+    <pre id="log"></pre>
+    <div id="map"></div>
+    <script type="module">
+        
+        import { Client } from 'https://cdn.jsdelivr.net/npm/@stomp/stompjs@7/+esm';
+
+        const log = (text) => document.getElementById("log").textContent += text + '\n';
+        const screeningId = 1
+
+        const seat_count = 120;
+
+        const map = document.getElementById("map");
+        for(let i = 1; i <=seat_count; i++){
+            const seat = document.createElement("div");
+            seat.id = 'seat-'+i;
+            seat.className = 'seat FREE';
+            seat.textContent = i;
+            map.appendChild(seat)
+            
+        }
+
+        function setStatus(seatId, status){
+            const seat = document.getElementById('seat-'+seatId);
+            seat.className = 'seat '+status;
+        }
+
+        async function loadSnap(){
+            const response = await fetch(`/screenings/${screeningId}/seats`);
+            const data = await response.json();
+            data.seats.forEach(s => setStatus(s.seatId, s.status));
+        }
+
+        const client = new Client({
+            brokerURL: 'ws://localhost:8081/ws',
+            reconnectDelay: 3000,
+            onConnect: async () => {
+                log('connected');
+                client.subscribe(`/topic/screenings/${screeningId}/seats`, (message) => {
+                const data = JSON.parse(message.body);
+                data.seats.forEach(s => setStatus(s.seatId, s.status));
+            });
+            await loadSnap();
+        },
+        onWebSocketClose: () => log('disconnected'),
+        onStompError: (frame) => log('error: ' + frame.headers['message']),
+        });
+
+        client.activate();
+    </script>
+</body>
+</html>
