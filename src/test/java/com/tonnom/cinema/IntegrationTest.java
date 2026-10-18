@@ -9,13 +9,17 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 
-@SpringBootTest 
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import (TestcontainersConfiguration.class)
 public abstract class IntegrationTest {
 
     @Autowired protected StringRedisTemplate redis;
     @Autowired protected JdbcTemplate jdbc;
 
+    protected  static final Long SCREENING = 1L;
+    protected  static final Long USER1 = 1L;
+    protected  static final Long USER2 = 2L;
 
     @BeforeEach 
     void reset(){
