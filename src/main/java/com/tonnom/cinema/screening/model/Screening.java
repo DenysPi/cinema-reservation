@@ -13,6 +13,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,7 +45,16 @@ public class Screening {
     @Column(name="start_time")
     LocalDateTime startTime;
 
+
+    @Column(name="end_time")
+    LocalDateTime endTime;
+
     @Column(name = "price")
-    
     int price;
+
+    @PrePersist 
+    @PreUpdate 
+    private void calculateEndTime(){
+        this.endTime = startTime.plusMinutes(movie.getDuration());
+    }
 }
