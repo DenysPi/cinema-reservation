@@ -1,7 +1,9 @@
 package com.tonnom.cinema.user.model;
 
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,4 +32,16 @@ public class User {
 
     @Column(name="first_name", nullable = false)
     private String firstName;
+
+    @Column(name="email", nullable = false)
+    private String email;
+
+    @Column(name="password", nullable = false)
+    private String password;
+
+    @Enumerated 
+    @Column(name = "role", nullable = false)
+    @Builder.Default
+    private Role role = Role.USER;
+    
 }
