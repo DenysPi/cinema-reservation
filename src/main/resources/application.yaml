@@ -10,6 +10,9 @@ spring:
       ddl-auto: validate
     show-sql: false
 
+  jwt:
+    secret: ${jWT_SECRET:je_dois_changer_apres}
+    expiration: 15
   data:
     redis:
       host: localhost
