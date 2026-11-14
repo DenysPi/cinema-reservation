@@ -1,3 +1,7 @@
+jwt:
+    secret: ${jWT_SECRET:je_dois_changer_apres_minimum_32_bytes}
+    expiration: 15
+
 spring:
   application:
     name: cinema-reservation
@@ -10,9 +14,7 @@ spring:
       ddl-auto: validate
     show-sql: false
 
-  jwt:
-    secret: ${jWT_SECRET:je_dois_changer_apres}
-    expiration: 15
+  
   data:
     redis:
       host: localhost
