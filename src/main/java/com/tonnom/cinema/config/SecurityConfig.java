@@ -2,7 +2,7 @@ package com.tonnom.cinema.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -32,8 +32,10 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 
-                .authorizeHttpRequests(auth ->
-                                auth.anyRequest().authenticated()
+                .authorizeHttpRequests(auth -> auth
+                                .requestMatchers("/", "/movies").permitAll()
+                                .requestMatchers("/auth/**").permitAll()
+                                .anyRequest().authenticated()
                 )  
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) 
                 .oauth2ResourceServer(oath -> oath

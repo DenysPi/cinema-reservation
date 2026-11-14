@@ -25,10 +25,11 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleConflict(RuntimeException e) {
         return new ErrorResponse(e.getMessage());
     }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleConflict(DataIntegrityViolationException e) {    
-        return new ErrorResponse("One or more seats are already taken");
+        return new ErrorResponse("Ressource already exists");
     }
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -22,7 +22,7 @@ public class JwtConfig {
     
     private final SecretKey secretKey;
 
-    public JwtConfig(@Value("${jwt-secret}") String secret){
+    public JwtConfig(@Value("${jwt.secret}") String secret){
         this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
 
     }
