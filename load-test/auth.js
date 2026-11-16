@@ -9,7 +9,9 @@ export function login(email, password){
         JSON.stringify({email,password}),
         { headers: { 'Content-Type': 'application/json' } }
     )
-
+    if (res.status !== 200) {
+        throw new Error(`login failed for ${email}: ${res.status} ${res.body}`);
+    }
     return res.json("accessToken");
     
 }

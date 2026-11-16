@@ -49,7 +49,7 @@ public class AuthService {
 
 
         return TokenResponse.builder()
-                        .accesToken(tokenService.createAccessToken(user))
+                        .accessToken(tokenService.createAccessToken(user))
                         .build();
     } 
 }

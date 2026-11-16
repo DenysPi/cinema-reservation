@@ -31,11 +31,13 @@ export const options = {
 };
 
 export function setup() {
-  return { tokens: loginUsers(USERS) };
+    const tokens = loginUsers(USERS) 
+    
+    return {tokens };
 }
 
-function holdUrl(seatId, userId) {
-  return `${BASE_URL}/screenings/${SCREENING_ID}/seats/${seatId}/hold?userId=${userId}`;
+function holdUrl(seatId) {
+  return `${BASE_URL}/screenings/${SCREENING_ID}/seats/${seatId}/hold`;
 }
 
 export default function(data){
@@ -54,14 +56,14 @@ export default function(data){
     const hold = [];
 
     for(const seatId of seatIds){
-        const res = http.post(holdUrl(seatId,userId),null, params)
+        const res = http.post(holdUrl(seatId),null, params)
 
         if (res.status === 201){
             hold.push(seatId);
         }else if(res.status===409){
             console.log(`409 on seat ${seatId}, step ${hold.length + 1}/${groupSize}: ${res.body}`);
             for(const heldSeat of hold){
-                http.del(holdUrl(heldSeat,userId))
+                http.del(holdUrl(heldSeat),null, params)
             }
             conflicts.add(1);
             return;
@@ -73,7 +75,7 @@ export default function(data){
     }
     const booking = http.post(
         `${BASE_URL}/bookings`,
-        JSON.stringify({ userId: userId, screeningId: SCREENING_ID, seatIds: seatIds }),
+        JSON.stringify({screeningId: SCREENING_ID, seatIds: seatIds }),
         params
     );
 
