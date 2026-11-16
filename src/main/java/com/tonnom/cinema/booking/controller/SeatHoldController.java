@@ -3,11 +3,13 @@ package com.tonnom.cinema.booking.controller;
 
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,7 +31,8 @@ public class SeatHoldController {
     @ResponseStatus(HttpStatus.CREATED)
     public SeatHoldResponse hold(@PathVariable Long screeningId,
                    @PathVariable Long seatId,
-                   @RequestParam Long userId) {
+                   @AuthenticationPrincipal Jwt jwt) {
+        Long userId = Long.valueOf(jwt.getSubject());
         return seatAvaibilityService.hold(screeningId, seatId, userId);
     }
 
@@ -37,7 +40,9 @@ public class SeatHoldController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void calcelHold(@PathVariable Long screeningId,
                    @PathVariable Long seatId,
-                   @RequestParam Long userId){
+                   @AuthenticationPrincipal Jwt jwt){
+
+        Long userId = Long.valueOf(jwt.getSubject());
         seatAvaibilityService.releaseSeat(screeningId, seatId, userId);
     }
 }

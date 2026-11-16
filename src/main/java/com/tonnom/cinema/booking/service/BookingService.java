@@ -47,13 +47,13 @@ public class BookingService {
     private final ApplicationEventPublisher eventPublisher;
     
     @Transactional 
-    public BookingResponse create(CreateBookingRequest request){
+    public BookingResponse create(CreateBookingRequest request, Long userId){
         List<Long> seatsIds = request.seatIds();
 
-        if(!seatAvaibilityService.areHeldBy(request.screeningId(), seatsIds, request.userId())){
+        if(!seatAvaibilityService.areHeldBy(request.screeningId(), seatsIds, userId)){
             throw new SeatNotHeldException("Your hold is missing or has expired");
         }
-        User user = userRepository.findById(request.userId()).orElseThrow(() -> new NotFoundException("User not found with id: " + request.userId()));
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
 
         Screening screening = screeningRepository.findById(request.screeningId()).orElseThrow(() -> new NotFoundException("Screening not found with id: " + request.screeningId()));
         
@@ -86,7 +86,7 @@ public class BookingService {
         bookingSeatRepository.saveAllAndFlush(bookingSeats);
         
 
-        eventPublisher.publishEvent(new BookingConfirmedEvent(request.screeningId(), seatsIds, request.screeningId(), screening.getStartTime()));
+        eventPublisher.publishEvent(new BookingConfirmedEvent(request.screeningId(), seatsIds, userId, screening.getStartTime()));
         
         return BookingResponse.builder()
             .bookingId(booking.getId())
