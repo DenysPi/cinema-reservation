@@ -1,4 +1,4 @@
-package com.tonnom.cinema.booking;
+package com.tonnom.cinema.booking.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -110,6 +110,7 @@ public class SeatAvaibilityServiceTest extends IntegrationTest{
 
     }
 
+    @Test 
     public void cancelBooking(){
         seatAvaibilityService.hold(SCREENING, 1L, USER1);
 

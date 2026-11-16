@@ -14,7 +14,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.server.LocalServerPort;
+
 import org.springframework.messaging.converter.JacksonJsonMessageConverter;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
@@ -32,8 +32,7 @@ import com.tonnom.cinema.booking.dto.BookingResponse;
 import com.tonnom.cinema.booking.dto.CreateBookingRequest;
 import com.tonnom.cinema.booking.dto.SeatUpdateMessage;
 import com.tonnom.cinema.booking.dto.SeatUpdateMessage.SeatUpdate;
-import com.tonnom.cinema.booking.model.Booking;
-import com.tonnom.cinema.booking.repository.BookingRepository;
+
 import com.tonnom.cinema.booking.service.BookingService;
 import com.tonnom.cinema.booking.service.SeatAvaibilityService;
 import com.tonnom.cinema.screening.dto.SeatStatus;
@@ -41,7 +40,7 @@ import com.tonnom.cinema.screening.dto.SeatStatus;
 
 public class SeatUpdateNotifierTest extends IntegrationTest {
     
-    @LocalServerPort int port;
+    
     @Autowired SeatAvaibilityService seatAvaibilityService;
     @Autowired BookingService bookingService;
     @Autowired ObjectMapper objectMapper;

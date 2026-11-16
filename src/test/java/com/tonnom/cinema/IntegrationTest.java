@@ -4,9 +4,12 @@ package com.tonnom.cinema;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+
 
 
 
@@ -16,6 +19,9 @@ public abstract class IntegrationTest {
 
     @Autowired protected StringRedisTemplate redis;
     @Autowired protected JdbcTemplate jdbc;
+    @Autowired protected JwtEncoder jwtEncoder;
+
+    @LocalServerPort protected  int port;
 
     protected  static final Long SCREENING = 1L;
     protected  static final Long USER1 = 1L;
@@ -26,5 +32,7 @@ public abstract class IntegrationTest {
         redis.getConnectionFactory().getConnection().serverCommands().flushAll();
         jdbc.execute("TRUNCATE booking_seats, bookings RESTART IDENTITY");
     }
+
+    
 
 }
