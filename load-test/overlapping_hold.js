@@ -1,12 +1,14 @@
 import http from 'k6/http';
 import {Counter} from 'k6/metrics';
+import { BASE_URL, loginUsers, authHeaders} from './auth.js';
+
 
 http.setResponseCallback(http.expectedStatuses(200, 201, 204, 409));
 
 const SCREENING_ID = 1;
 const FIRST_SEAT_ID = 1;
 const SEAT_COUNT = 120;
-const BASE_URL = 'http://localhost:8081';
+const USERS = 200
 
 const created = new Counter('bookings_created');
 const conflicts = new Counter('bookings_conflicts');
@@ -18,7 +20,7 @@ export const options = {
   scenarios: {
     overlapping: {
       executor: 'per-vu-iterations',
-      vus: 200,
+      vus: USERS,
       iterations: 1,
     },
   },
@@ -28,13 +30,19 @@ export const options = {
   },
 };
 
-function holdUrl(seatId, userId) {
-  return `${BASE_URL}/screenings/${SCREENING_ID}/seats/${seatId}/hold?userId=${userId}`;
+export function setup() {
+    const tokens = loginUsers(USERS) 
+    
+    return {tokens };
 }
 
-export default function(){
+function holdUrl(seatId) {
+  return `${BASE_URL}/screenings/${SCREENING_ID}/seats/${seatId}/hold`;
+}
 
-    const userId = __VU;
+export default function(data){
+
+    const params = authHeaders(data.tokens[__VU - 1]);     
 
     const groupSize = 1 + Math.floor(Math.random()*3);
     const start = FIRST_SEAT_ID + Math.floor(Math.random() * (SEAT_COUNT-groupSize+1))
@@ -48,14 +56,14 @@ export default function(){
     const hold = [];
 
     for(const seatId of seatIds){
-        const res = http.post(holdUrl(seatId,userId))
+        const res = http.post(holdUrl(seatId),null, params)
 
         if (res.status === 201){
             hold.push(seatId);
         }else if(res.status===409){
             console.log(`409 on seat ${seatId}, step ${hold.length + 1}/${groupSize}: ${res.body}`);
             for(const heldSeat of hold){
-                http.del(holdUrl(heldSeat,userId))
+                http.del(holdUrl(heldSeat),null, params)
             }
             conflicts.add(1);
             return;
@@ -67,8 +75,8 @@ export default function(){
     }
     const booking = http.post(
         `${BASE_URL}/bookings`,
-        JSON.stringify({ userId: userId, screeningId: SCREENING_ID, seatIds: seatIds }),
-        { headers: { 'Content-Type': 'application/json' } }
+        JSON.stringify({screeningId: SCREENING_ID, seatIds: seatIds }),
+        params
     );
 
     if (booking.status === 201) {

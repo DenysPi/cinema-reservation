@@ -2,7 +2,7 @@ package com.tonnom.cinema.common.exception;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -25,10 +25,17 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleConflict(RuntimeException e) {
         return new ErrorResponse(e.getMessage());
     }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleConflict(DataIntegrityViolationException e) {    
-        return new ErrorResponse("One or more seats are already taken");
+        return new ErrorResponse("Ressource already exists");
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleUnautorized(RuntimeException e){
+        return new ErrorResponse("Invalid email or password");
     }
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
