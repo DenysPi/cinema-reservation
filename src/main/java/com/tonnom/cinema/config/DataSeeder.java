@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.tonnom.cinema.hall.model.Hall;
@@ -16,6 +17,7 @@ import com.tonnom.cinema.movie.repository.MovieRepository;
 
 import com.tonnom.cinema.screening.model.Screening;
 import com.tonnom.cinema.screening.repository.ScreeningRepository;
+import com.tonnom.cinema.user.model.Role;
 import com.tonnom.cinema.user.model.User;
 import com.tonnom.cinema.user.repository.UserRepository;
 
@@ -26,12 +28,15 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor 
 @Slf4j 
 public class DataSeeder implements CommandLineRunner {
+
     private final MovieRepository movieRepository;
     private final ScreeningRepository screeningRepository;
     private final UserRepository userRepository;
     private final HallRepository hallRepository;
     private final SeatRepository seatRepository;
 
+        
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override 
@@ -104,10 +109,17 @@ public class DataSeeder implements CommandLineRunner {
                 .price(11)
                 .build());
 
+
+        String hash = passwordEncoder.encode("password_1234");
+
+
         List<User> users = new ArrayList<>();
         for (int i = 1; i <= 1000; i++) {
                 users.add(User.builder()
                         .firstName("User" + i)
+                        .email("user"+i+"@gmail.com")
+                        .password(hash)
+                        .role(Role.USER)
                         .build());
         }
         userRepository.saveAll(users);
