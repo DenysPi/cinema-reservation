@@ -19,8 +19,7 @@ import com.tonnom.cinema.IntegrationTest;
 import com.tonnom.cinema.booking.dto.BookingResponse;
 import com.tonnom.cinema.booking.dto.CreateBookingRequest;
 
-import com.tonnom.cinema.booking.service.BookingService;
-import com.tonnom.cinema.booking.service.SeatAvaibilityService;
+
 import com.tonnom.cinema.common.exception.SeatAlreadyHeldException;
 import com.tonnom.cinema.common.exception.SeatNotHeldException;
 
