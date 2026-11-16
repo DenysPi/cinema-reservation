@@ -64,8 +64,8 @@ public class SeatAvaibilityServiceTest extends IntegrationTest{
 
     @Test 
     void userCannotBookWithoutHoldingSeat(){
-        CreateBookingRequest request = new CreateBookingRequest(USER1, SCREENING, List.of(1L));
-        assertThatThrownBy(() -> bookingService.create(request)).isInstanceOf(SeatNotHeldException.class);
+        CreateBookingRequest request = new CreateBookingRequest(SCREENING, List.of(1L));
+        assertThatThrownBy(() -> bookingService.create(request, USER1)).isInstanceOf(SeatNotHeldException.class);
 
         assertThat(bookingService.getByUser(USER1)).isEmpty();
         
@@ -78,8 +78,8 @@ public class SeatAvaibilityServiceTest extends IntegrationTest{
         seatAvaibilityService.hold(SCREENING, 2L, USER1);
         seatAvaibilityService.hold(SCREENING, 3L, USER1);
 
-        CreateBookingRequest request = new CreateBookingRequest(USER1, SCREENING, List.of(1L,2L));
-        bookingService.create(request);
+        CreateBookingRequest request = new CreateBookingRequest(SCREENING, List.of(1L,2L));
+        bookingService.create(request, USER1);
 
         List<BookingResponse> bookings = bookingService.getByUser(USER1);
         assertThat(bookings).hasSize(1);
@@ -102,8 +102,8 @@ public class SeatAvaibilityServiceTest extends IntegrationTest{
         seatAvaibilityService.hold(SCREENING, 1L, USER1);
         
 
-        CreateBookingRequest request = new CreateBookingRequest(USER1, SCREENING, List.of(1L));
-        bookingService.create(request);
+        CreateBookingRequest request = new CreateBookingRequest(SCREENING, List.of(1L));
+        bookingService.create(request, USER1);
 
         assertThatThrownBy(() ->seatAvaibilityService.hold(SCREENING, 1L, USER1)).isInstanceOf(SeatAlreadyHeldException.class);
 
@@ -113,8 +113,8 @@ public class SeatAvaibilityServiceTest extends IntegrationTest{
     public void cancelBooking(){
         seatAvaibilityService.hold(SCREENING, 1L, USER1);
 
-        CreateBookingRequest request = new CreateBookingRequest(USER1, SCREENING, List.of(1L));
-        BookingResponse response = bookingService.create(request);
+        CreateBookingRequest request = new CreateBookingRequest( SCREENING, List.of(1L));
+        BookingResponse response = bookingService.create(request, USER1);
 
         bookingService.cancel(response.reference());
 

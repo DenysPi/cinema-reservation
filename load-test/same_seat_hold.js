@@ -12,7 +12,7 @@ const errors = new Counter('bookings_error');
 
 
 const SCREENING_ID = 1;
-const SEAT_ID = 4;
+const SEAT_ID = 55;
 const USERS = 200
 
 export const options = {
@@ -26,6 +26,7 @@ export const options = {
   thresholds: {
     bookings_creates: ['count==1'], 
     bookings_error: ['count==0'],  
+    'http_req_duration{scenario:same_seat}': ['p(95)<1000'],
   },
 };
 

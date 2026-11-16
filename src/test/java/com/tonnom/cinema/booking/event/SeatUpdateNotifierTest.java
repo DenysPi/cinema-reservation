@@ -132,7 +132,7 @@ public class SeatUpdateNotifierTest extends IntegrationTest {
             assertThat(received.poll(5, TimeUnit.SECONDS)).isNotNull();
         }
 
-        bookingService.create(new CreateBookingRequest(USER1, SCREENING,List.of(1L,2L,3L)));
+        bookingService.create(new CreateBookingRequest(SCREENING,List.of(1L,2L,3L)), USER1);
 
         SeatUpdateMessage update = received.poll(5, TimeUnit.SECONDS);
 
@@ -152,7 +152,7 @@ public class SeatUpdateNotifierTest extends IntegrationTest {
             assertThat(received.poll(5, TimeUnit.SECONDS)).isNotNull();
         }
 
-        BookingResponse booking = bookingService.create(new CreateBookingRequest(USER1, SCREENING,List.of(1L,2L,3L)));
+        BookingResponse booking = bookingService.create(new CreateBookingRequest(SCREENING,List.of(1L,2L,3L)), USER1);
 
         assertThat(received.poll(5, TimeUnit.SECONDS)).isNotNull();
 

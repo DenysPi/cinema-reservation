@@ -38,9 +38,9 @@ public class AuthServiceTest extends IntegrationTest {
 
         TokenResponse response = authService.login(new LoginRequest("user1@gmail.com", "password_1234"));
 
-        assertThat(response.accesToken()).isNotBlank();
+        assertThat(response.accessToken()).isNotBlank();
 
-        Jwt jwt = jwtDecoder.decode(response.accesToken());
+        Jwt jwt = jwtDecoder.decode(response.accessToken());
 
         assertThat(jwt.getSubject()).isEqualTo(user1.getId().toString());
         assertThat(jwt.getClaimAsStringList("roles")).containsExactly("USER");
