@@ -35,6 +35,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/", "/movies").permitAll()
                                 .requestMatchers("/auth/**").permitAll()
+                                .requestMatchers("/ws/**").permitAll()  
                                 .anyRequest().authenticated()
                 )  
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) 
