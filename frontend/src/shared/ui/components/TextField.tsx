@@ -12,7 +12,7 @@ export default function TextField({label, value, onChange, type='text', ...rest}
     return (
         <label>
             {label}
-            <input type={type} value={value} onChange={(e) => e.target.value} {...rest}/>
+            <input type={type} value={value} onChange={(e) => onChange(e.target.value)} {...rest}/>
         </label>
 
     )

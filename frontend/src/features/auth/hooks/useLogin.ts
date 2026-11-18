@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import {useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { authApi } from "../api/authApi";
+
 import type { LoginRequest } from "../types";
 import { ApiError } from "../../../shared/api/ApiError";
+import { useAuth } from "../../../context/AuthContext";
 
 export function useLogin(){
 
+    const {login: authLogin} = useAuth();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
@@ -16,8 +18,8 @@ export function useLogin(){
         setError(null)
 
         try{
-            const {accessToken} = await authApi.login(request);
-            localStorage.setItem('token', accessToken);
+            await authLogin(request);
+           
             navigate('/movies');
         }catch(e){
             setError(e instanceof ApiError && e.status === 401

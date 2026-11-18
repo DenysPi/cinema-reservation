@@ -14,6 +14,11 @@ export async function http<T>(path: string, options: RequestInit = {}): Promise<
             ...options.headers,
         },
     });
+    
+
+    if(response.status === 401 && token){
+        window.dispatchEvent(new Event('auth:logout'))
+    }
 
     if (!response.ok){
         const body = await response.json().catch(()=> ({}))
